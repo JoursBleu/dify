@@ -1,0 +1,43 @@
+provider: radeon_cloud
+label:
+  en_US: Radeon Cloud
+  zh_Hans: Radeon Cloud
+description:
+  en_US: OpenAI-compatible models served by AMD Radeon Cloud Token Factory.
+  zh_Hans: AMD Radeon Cloud Token Factory 提供的 OpenAI-compatible 模型。
+icon_small:
+  en_US: icon.svg
+icon_large:
+  en_US: icon.svg
+background: "#F5F5F5"
+help:
+  title:
+    en_US: Get your Radeon Cloud API key
+    zh_Hans: 获取 Radeon Cloud API Key
+  url:
+    en_US: https://developer.amd.com.cn/radeon/tokenfactory
+supported_model_types:
+  - llm
+configurate_methods:
+  - predefined-model
+provider_credential_schema:
+  credential_form_schemas:
+    - variable: api_key
+      label:
+        en_US: API Key
+        zh_Hans: API Key
+      type: secret-input
+      required: true
+      placeholder:
+        en_US: Enter your rc-* API key
+        zh_Hans: 输入 rc-* API Key
+models:
+  llm:
+    position: models/llm/_position.yaml
+    predefined:
+      - models/llm/*.yaml
+extra:
+  python:
+    provider_source: provider/radeon_cloud.py
+    model_sources:
+      - models/llm/llm.py

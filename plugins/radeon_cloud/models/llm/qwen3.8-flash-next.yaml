@@ -1,0 +1,35 @@
+# Conservative pre-release output cap; verify against the public endpoint before publishing.
+model: Qwen3.8-Flash-Next
+label:
+  en_US: Qwen3.8 Flash Next
+  zh_Hans: Qwen3.8 Flash Next
+model_type: llm
+features:
+  - agent-thought
+  - vision
+  - tool-call
+  - stream-tool-call
+model_properties:
+  mode: chat
+  context_size: 262144
+parameter_rules:
+  - name: max_tokens
+    use_template: max_tokens
+    default: 4096
+    min: 1
+    max: 32768
+  - name: response_format
+    label:
+      en_US: Response Format
+      zh_Hans: 回复格式
+    type: string
+    required: false
+    options:
+      - text
+      - json_object
+pricing:
+  input: "0.14"
+  output: "0.28"
+  unit: "0.000001"
+  currency: USD
+deprecated: false

@@ -1,0 +1,35 @@
+# Conservative pre-release output cap; verify against the public endpoint before publishing.
+model: DeepSeek-V4.1-Flash
+label:
+  en_US: DeepSeek V4.1 Flash
+  zh_Hans: DeepSeek V4.1 Flash
+model_type: llm
+features:
+  - agent-thought
+  - vision
+  - tool-call
+  - stream-tool-call
+model_properties:
+  mode: chat
+  context_size: 1048576
+parameter_rules:
+  - name: max_tokens
+    use_template: max_tokens
+    default: 4096
+    min: 1
+    max: 65536
+  - name: response_format
+    label:
+      en_US: Response Format
+      zh_Hans: 回复格式
+    type: string
+    required: false
+    options:
+      - text
+      - json_object
+pricing:
+  input: "0.28"
+  output: "0.56"
+  unit: "0.000001"
+  currency: USD
+deprecated: false
