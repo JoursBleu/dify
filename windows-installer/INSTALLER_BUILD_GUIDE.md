@@ -23,6 +23,9 @@ Marketplace publisher account verification are separate from this local slug.
 - `tests/test_installer.py`: offline configuration/safety regression using a
   temporary synthetic configuration, not a user's `.env`.
 - `tests/test_windows_bridge.ps1`: native EXE, WSL and optional HTTP checks.
+- `tests/verify_saved_key_runtime.py`: opt-in bounded native calls using only
+   credentials already saved in Dify. Choose the old canonical provider explicitly
+   when checking an installed 0.0.7 instance; this never migrates keys.
 
 The provider source is in `../plugins/amdgpucloud`. Generated `.difypkg`, EXE,
 Compose binary, environments and build caches are excluded from Git. The
