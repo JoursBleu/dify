@@ -1,0 +1,12 @@
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.py[cod]
+.venv*/
+.env
+build/
+*.exe
+*.exe.sha256
+payload/plugins/*.difypkg
+payload/tools/docker-compose-linux-x86_64
+!payload/windows/installer.manifest

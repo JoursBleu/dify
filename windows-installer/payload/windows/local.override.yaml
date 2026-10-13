@@ -1,0 +1,48 @@
+# These changes apply only to the installer-created local Dify project.
+services:
+  init_permissions:
+    command: !override
+      - sh
+      - -ec
+      - |
+        chown -R 1001:1001 /app/api/storage
+        touch /app/api/storage/.init_permissions
+        echo "Storage permissions initialized."
+  api:
+    restart: unless-stopped
+  api_websocket:
+    restart: unless-stopped
+  worker:
+    restart: unless-stopped
+  worker_beat:
+    restart: unless-stopped
+  web:
+    restart: unless-stopped
+    environment:
+      NEXT_TELEMETRY_DISABLED: "1"
+  db_postgres:
+    restart: unless-stopped
+  redis:
+    restart: unless-stopped
+  weaviate:
+    restart: unless-stopped
+  sandbox:
+    restart: unless-stopped
+  local_sandbox:
+    restart: unless-stopped
+    environment:
+      SHELLCTL_ENABLE_PATH_ISOLATION: "true"
+  agent_backend:
+    restart: unless-stopped
+  ssrf_proxy:
+    restart: unless-stopped
+  agent_ssrf_proxy:
+    restart: unless-stopped
+  plugin_daemon:
+    restart: unless-stopped
+    ports: !override
+      - "127.0.0.1:${EXPOSE_PLUGIN_DEBUGGING_PORT}:5003"
+  nginx:
+    restart: unless-stopped
+    ports: !override
+      - "127.0.0.1:${EXPOSE_NGINX_PORT}:80"

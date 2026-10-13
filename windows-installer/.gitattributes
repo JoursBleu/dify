@@ -1,0 +1,4 @@
+# Preserve intentional Markdown hard line breaks.
+*.md whitespace=-blank-at-eol
+# The pinned deployment snapshot is redistributed byte-for-byte from upstream.
+payload/docker/** whitespace=-blank-at-eol,-blank-at-eof

@@ -1,0 +1,11 @@
+AMDGPUCloud visual reference: Cherry Studio AMD GPU Cloud provider integration.
+Cherry Studio uses the AMD GPU Cloud page logo, centered on a white square canvas.
+Its historical https://amd-ai-academy.com/static/image.png URL returned 502 during this task.
+The current AMD GPU Cloud page references the first-party replacement:
+https://notebooks.amd.com/static/image.png
+Downloaded original PNG: 800 x 191, 13,320 bytes.
+Original SHA-256: b1f64a122dbd2d3d3010bffe3ef38dd56760d5896be44bdf5e416dcff0902153.
+icon.png is a locally stored 256 x 256 PNG with the original logo on a white canvas.
+No remote URL is loaded by the icon at runtime.
+AMD names and marks remain the property of their owners.
+This development package does not represent an approved AMD Marketplace publisher.

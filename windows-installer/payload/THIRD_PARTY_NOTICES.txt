@@ -1,0 +1,30 @@
+Dify: LangGenius, Inc.
+Version 1.17.1, commit 8387590ace4a094de812b7847fc6a4c3a27cd52b.
+Deployment assets are redistributed with the original LICENSE and notices.
+https://github.com/langgenius/dify/releases/tag/1.17.1
+
+Docker Compose: Docker, Inc. / open-source contributors, Apache License 2.0.
+Version v5.6.0 Linux x86_64 official release binary.
+SHA-256: 40343e21ca777173e69cff5dbafeb37c6f81f3b0d57d9e597f036e95eb63e76a.
+https://github.com/docker/compose/releases/tag/v5.6.0
+
+Container images are downloaded from their upstream registries at installation time.
+Each upstream image retains its original license and distribution terms.
+This installer does not redistribute Docker Desktop or silently accept its license.
+
+Local installer integration (not Dify or Docker authorship):
+Author: Letian Kang.
+Contact: Letian.Kang@amd.com.
+
+AMDGPUCloud model provider (AMD GPU Cloud / Token Factory): integration preview 0.0.8.
+Author: Letian Kang.
+Contact: Letian.Kang@amd.com.
+Personal publisher slug: letian-kang (valid lowercase format, unlike dotted letian.kang).
+Native plugin ID: letian-kang/amdgpucloud.
+Canonical model provider: letian-kang/amdgpucloud/amdgpucloud.
+Package SHA-256: 66f7bd9c8e15136a57228088daa647953d0a373a430d85ee11abff9c5bc5e845.
+This slug does not prove verified publisher account ownership or Marketplace approval.
+Brand logo source: https://notebooks.amd.com/static/image.png.
+The logo is packaged locally; no runtime remote-image requests are required.
+Trademark ownership remains with AMD; inclusion is not a claim of official publisher approval.
+No production keys, account passwords or signed Marketplace identity are embedded.

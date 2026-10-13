@@ -1,0 +1,71 @@
+AMDGPUCloud（AMD GPU Cloud / Token Factory）— Dify 插件安装说明（Windows）
+版本：0.0.8 个人发布者预览版
+作者：Letian Kang
+联系邮箱：Letian.Kang@amd.com
+
+一、这是什么
+本下载包包含可导入 Dify 的 amdgpucloud.difypkg。
+它不是 Windows 独立应用，不需要也不包含 EXE/MSI。
+Windows 电脑通过浏览器登录已有 Dify，然后安装到 Dify Workspace。
+实际推理通过 AMD Radeon Cloud API 完成，本机无需安装 Python、ROCm 或显卡驱动。
+本包不安装 Dify 服务本身；需要已有 Dify Cloud 或自建 Dify。
+
+二、安装
+1. 使用 AMDGPUCloud-0.0.8.difypkg，或安装器附带的同版 amdgpucloud.difypkg。
+2. 在浏览器登录你的 Dify Workspace。
+3. 打开 Integrations（集成），点击 Install（安装），选择 From Local File／从本地文件。
+4. 选择上述 .difypkg 文件，确认权限后安装。
+5. 打开 Integrations → Model Provider（模型提供方）→ AMDGPUCloud。
+6. 从 https://developer.amd.com.cn/radeon/modelapis 登录取得自己的 rc-* API Key。
+7. 在 Dify 的 AMDGPUCloud 凭据框填写 Key，保存。
+8. 在 Chat／Agent／Workflow 的模型选择器中选取 AMDGPUCloud 模型。
+
+发布者letian-kang，插件名和Provider名amdgpucloud；安装框显示letian-kang/amdgpucloud。
+带点的letian.kang不符合Dify原生标识语法，使用连字符合法形式；不把产品名再当作者名。
+显示名AMDGPUCloud不变，人类作者与AMD联系邮箱保留。
+0.0.8与旧版技术身份不同，不是同ID升级：应先配置新Provider并迁移已有默认模型／应用引用。
+只有确认旧Provider无凭据或所有引用已迁移后，才通过Dify原生管理卸载旧插件。
+不要重新安装Dify来迁移插件；安装器不会自动复制Key、改写应用或卸载旧插件。
+
+不同 Dify 版本的按钮名称可能不同。安装插件和保存模型凭据需要相应 Workspace 权限。
+本包是尚未通过 Marketplace 发布签名的开发预览包。
+若 Dify 拒绝未验证插件或不提供本地包入口，请联系 Workspace 管理员；
+不要为了安装本包擅自关闭生产平台的安全校验。
+
+三、首版模型
+DeepSeek-V4-Flash
+DeepSeek-V4.1-Flash
+Qwen3.8-Flash-Next
+
+固定 API Base URL：https://developer.amd.com.cn/radeon/api/v1
+不需要手填 URL，不要使用 AMD 内部订阅 Key。
+保存 Key 时会发送 1 Token 的短验证请求，会消耗极少额度。
+
+四、验收边界
+本版已通过离线协议与安全回归、打包和本地包检查。
+真实 rc-* Key 的公网 Live Test 和真实 Dify UI 端到端验收尚未完成。
+不承诺安装后所有业务路径均已验证；建议先用于测试 Workspace。
+模型最大输出是待验证的预览限制，不是平台生产承诺。
+不声明并行工具、JSON Schema、Embedding、OCR 或视频能力。
+
+五、计费与隐私
+Dify 显示普通输入／输出的估算费用，不包含缓存折扣。
+实际扣费、免费额度和限额以 Token Factory 账号和账单为准。
+请求固定带 X-Source: dify，以汇总渠道用量，不附加用户／工作区／会话 ID。
+Prompt、历史、图片和工具结果会发送到 AMD API；平台和模型服务可能保留请求日志。
+不应将插件未新增存储理解成平台零留存。
+API Key 只填写到 Dify 安全凭据框，不要发送到聊天、GitHub、截图或日志。
+
+六、卸载与核验
+在 Dify 的 Integrations 页面找到 AMDGPUCloud，选择 Uninstall。
+先更换引用 AMDGPUCloud 模型的 App／Workflow，否则它们在卸载后不能继续调用。
+泄漏或不再使用的 Key 请在 Token Factory 撤销／重置；卸载插件不自动撤销云端 Key。
+同目录 .sha256 文件提供当前下载包哈希；历史 ZIP 的 SHA256SUMS.txt 只适用于对应旧版。
+
+七、支持
+开发源码：https://github.com/JoursBleu/dify
+feature/radeon-cloud-provider分支plugins/amdgpucloud；仓库owner与插件发布者slug不同。
+作者：Letian Kang
+开发联系：Letian.Kang@amd.com
+机器身份letian-kang/amdgpucloud，不把带点姓名或大写品牌名填入技术标识。
+正式 AMD Publisher、品牌图标、法务材料和 Marketplace 发布仍待确认。

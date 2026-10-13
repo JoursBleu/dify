@@ -1,0 +1,83 @@
+Dify Windows 完整安装器
+版本：Dify 1.17.1 / 安装器 1.0.8 / AMDGPUCloud 插件 0.0.8
+插件与本地集成作者：Letian Kang
+联系邮箱：Letian.Kang@amd.com
+
+这是真正部署并启动 Dify 平台的 EXE，不是只有一个模型插件。
+安装器已内嵌 Dify 官方 Docker 部署资产、Compose 运行器、许可证和 AMDGPUCloud 标准插件包。
+首次安装需要联网下载 Dify API/Web、PostgreSQL、Redis、Weaviate、Sandbox、Agent 等运行镜像。
+本版为联网安装器，不声称在无 Docker/WSL 的全新 Windows 上完全离线安装。
+
+前提：Windows 10/11 x64、已启用 WSL2、WSL 内可用 Docker Engine 或 Docker Desktop WSL 集成。
+完整本地栈建议至少给 WSL/Docker 4 核、8 GiB 内存和 20 GiB Linux 文件系统自由空间。
+若前置依赖缺失，界面会指出原因并提供官方说明，不静默修改系统、接受 Docker 许可或重启电脑。
+现有 WSL Docker Engine 可直接复用，无须额外安装 Docker Desktop。
+Docker Desktop 在大型企业商业使用时可能需要订阅，请按官方许可核对。
+
+关闭之前的旧安装器，双击 Dify-Setup-1.17.1-Windows-x64-1.0.8.exe：
+1. 选择已有 WSL2 发行版，默认本机端口 18080。
+2. 阅读 Dify 许可证，仅用于自己的单工作区，不移除 Dify 标识或版权。
+3. 点击“安装并启动 Dify”；首次镜像下载需要数分钟，视网络而定。
+4. 就绪后自动打开 http://127.0.0.1:18080/install，自行创建管理员账号。
+5. 桌面与开始菜单会建立启动、停止和打开网页入口。
+若公司浏览器代理影响localhost访问，将localhost/127.0.0.1加入代理例外；安装器自检不走代理。
+
+1.0.1 已修复 Windows .NET 调用 wsl.exe 时发行版名带引号造成 WSL_E_DISTRO_NOT_FOUND 的问题。
+不需要因此重装 WSL 或 Docker。失败日志会显示步骤、退出码以及 WSL 的原始非敏感错误。
+1.0.2 修复 .NET 将 localhost 解析到 IPv6 ::1 导致最后网页检测超时，统一使用127.0.0.1。
+如果已显示“Dify application and setup API are ready”并建立快捷方式，服务已经启动；
+不要因旧版最后“操作超时”重复安装，直接打开 http://127.0.0.1:18080/install。
+新版在服务已启动后把最后网页检测问题显示为警告，不冒充整个安装失败。
+1.0.3 附带插件0.0.3，修复旧包author大写造成的 plugin_unique_identifier 校验失败。
+已安装Dify无需重装；直接在集成→安装→从本地文件上传新版插件。
+1.0.4 附带插件0.0.4，作者署名与邮箱更新为Letian Kang／Letian.Kang@amd.com。
+当时保留了个人机器身份；本节是历史说明，1.0.7已全面替换为AMDGPUCloud本地namespace。
+1.0.5 参照Cherry Studio的AMD GPU Cloud集成，插件和供应商名称统一为AMDGPUCloud。
+删除专属“Radeon 插件”按钮，改为“插件管理”，只打开Dify原生集成页面。
+该按钮不解包、不安装插件、不修改签名策略；所有插件共用Dify的安装、配置和卸载机制。
+已运行的Dify无需重装或重启，直接在原生集成页面安装或升级新版插件即可。
+1.0.6 补齐安装器可见署名、Windows文件属性、插件中英文介绍与邮箱、包内及展开安装说明。
+作者和联系邮箱统一为Letian Kang／Letian.Kang@amd.com；Dify和Docker原有版权不修改。
+插件目录附带安装说明、中文指南与隐私声明；更新这些文件不重建或重启现有服务。
+1.0.7不仅修改显示名称，也将publisher、插件名和Provider名统一为amdgpucloud。
+原生安装框标识amdgpucloud/amdgpucloud；新包与旧版不是同ID升级。
+应先配置新Provider并迁移默认模型／应用引用，再确认旧Provider无依赖后通过Dify原生页面卸载。
+安装器不会自动复制Key、改写应用或移除旧插件；不需要重新安装Dify。
+1.0.8按作者与产品分工更正publisher为letian-kang，产品名/provider保持amdgpucloud。
+安装框letian-kang/amdgpucloud；letian.kang中的点不符合Dify原生语法。
+合法slug不证明Marketplace账号归属；代码Git仓库owner与插件publisher不是同一个字段。
+
+运行数据保存在该 WSL 用户的 ~/.local/share/dify-windows，而不是 Windows NTFS 挂载目录。
+安装器界面和部署载荷保存在当前用户 LocalAppData/Programs/DifyLocal。
+停止不会删除数据库、上传文件、插件或 Docker volumes；不会操作其他 Compose 项目。
+本版本只做全新隔离安装，不接管已有 Dify，也不自动迁移旧 Weaviate 数据。
+仅发布宿主 loopback 的网页端口18080与调试端口15003，不开放局域网。
+
+AMDGPUCloud 原生模型提供方：
+1. 打开Dify的“集成”，或点击安装器通用“插件管理”（http://127.0.0.1:所选端口/integrations）。
+2. 使用Dify“安装→从本地文件”导入Downloads里的AMDGPUCloud-0.0.8.difypkg。
+	安装器内嵌的同一插件位于payload/plugins/amdgpucloud.difypkg。
+3. 在“集成→模型提供方→AMDGPUCloud”中配置自己的rc-* Key。
+发布者letian-kang，插件名和Provider名amdgpucloud，显示名称AMDGPUCloud。
+插件ID为letian-kang/amdgpucloud；完整供应商名letian-kang/amdgpucloud/amdgpucloud。
+个人publisher与正式Marketplace账号归属批准不同，不宣称官方签名或上架。
+获取Key：https://developer.amd.com.cn/radeon/modelapis（手动获取，不复制Cherry的登录来源参数）。
+固定API：https://developer.amd.com.cn/radeon/api/v1；模型请求仍携带X-Source: dify。
+插件尚未 Marketplace 签名；本地 Dify 默认验证插件签名。
+只有你明确勾选“允许未签名开发插件（仅此新建本地实例）”才会在新实例放开该校验。
+该选项是实例级而非单包白名单，不会修改其他 Dify 生产服务。
+真实公网模型和业务路径仍需用户自己的测试 Key 验证，不内置任何 API Key。
+
+完整 Dify 的代码/Workflow/RAG/Agent 功能保持官方组件；模型提供方的能力和计费独立。
+AMDGPUCloud 本版不提供 Embedding/OCR/JSON Schema/并行工具，不能用聊天模型代替知识库向量模型。
+
+安全与卸载：
+所有实例服务密钥首次安装随机生成并以0600权限保存，不显示到日志，不写入EXE。
+关闭窗口不等于停止服务；需要在界面点“停止 Dify”。
+恢复从桌面入口启动即可；不默认添加开机计划任务。
+此 EXE 尚未商业代码签名，不能将其宣称为 AMD 或 Dify 官方签名发行包。
+先停止本实例并备份 WSL 数据，再人工决定是否删除；不提供一键删除数据按钮。
+
+官方部署文档：https://docs.dify.ai/en/self-host/quick-start/docker-compose
+固定发布：https://github.com/langgenius/dify/releases/tag/1.17.1
+Dify 使用附加条款的 Apache 2.0 许可；LICENSE 随包保留，禁止移除前端LOGO和版权。
