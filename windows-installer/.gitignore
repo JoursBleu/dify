@@ -1,0 +1,32 @@
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+*.py[cod]
+.venv*/
+.env
+build/
+*.exe
+*.exe.sha256
+.prepare-payload.*/
+.prepare-payload.lock
+# Materialized from the exact upstream commit and canonical API/plugin sources.
+/payload/docker/
+/payload/api-compat/
+/payload/.upstream-commit
+/payload/.prepared.sha256
+/payload/plugins/*.difypkg
+/payload/plugins/INSTALL_windows_zh_Hans.txt
+/payload/plugins/PRIVACY.md
+/payload/plugins/README_zh_Hans.md
+/payload/tools/docker-compose-linux-x86_64
+# Container images are pulled at installation, never published build inputs.
+/payload/images/
+# Unused local reference image; not an installer input.
+/cherry-brand-logo.png
+# Obsolete operator-only helpers are not source/build/runtime entry points.
+/tests/sync_linux_bootstrap.sh
+/tests/sync_public_installation.ps1
+/tests/verify_native_plugin.py
+/tests/verify_saved_key_runtime.py
+/tests/test_saved_key_verifier.py
+!payload/windows/installer.manifest

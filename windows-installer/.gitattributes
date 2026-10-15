@@ -1,0 +1,6 @@
+# Preserve intentional Markdown hard line breaks.
+*.md whitespace=-blank-at-eol
+# WSL scripts must stay executable by bash after a Windows-native checkout.
+*.sh text eol=lf
+# Compare the tracked license against the release Git blob without CRLF rewriting.
+payload/LICENSE text eol=lf

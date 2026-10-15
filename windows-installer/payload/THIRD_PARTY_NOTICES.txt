@@ -1,0 +1,38 @@
+Dify: LangGenius, Inc.
+Version 1.17.1, commit 8387590ace4a094de812b7847fc6a4c3a27cd52b.
+Deployment assets are redistributed with the original LICENSE and notices.
+https://github.com/langgenius/dify/releases/tag/1.17.1
+
+Docker Compose: Docker, Inc. / open-source contributors, Apache License 2.0.
+Version v5.6.0 Linux x86_64 official release binary.
+SHA-256: 40343e21ca777173e69cff5dbafeb37c6f81f3b0d57d9e597f036e95eb63e76a.
+https://github.com/docker/compose/releases/tag/v5.6.0
+
+Container images are downloaded from their upstream registries at installation time.
+Each upstream image retains its original license and distribution terms.
+This installer does not redistribute Docker Desktop or silently accept its license.
+
+Local installer integration (not Dify or Docker authorship):
+Author: Letian Kang.
+Contact: Letian.Kang@amd.com.
+
+AMDTokenFactory model provider: dynamic local release 0.0.10.
+Author: Letian Kang.
+Contact: Letian.Kang@amd.com.
+Plugin ID: amdtokenfactory/amdtokenfactory.
+Canonical model provider: amdtokenfactory/amdtokenfactory/amdtokenfactory.
+Required package: AMDTokenFactory-0.0.10.difypkg.
+Package SHA-256: a52e0e67f0c152d2d458ac77e4ac4fc189bd69e2d29d81f07b3f2d3555ebb528.
+Fixed checksum guards must not be bypassed; a repackaged plugin requires a new audit and consistent release hash updates.
+This new identity does not migrate credentials from the old amdgpucloud/amdgpucloud/amdgpucloud namespace.
+An installed old Dify instance and its old plugin must not be uninstalled for this rename; its saved Key must not be exported, copied or pasted into the new identity.
+Old credentials, defaults and application references remain untouched; new credential configuration requires separate user authorization in an isolated instance.
+No static model catalog is embedded; model metadata comes from the fixed public /models endpoint.
+This local release includes two minimal Dify API method overlays for native dynamic-list compatibility.
+The pinned SDK/daemon do not fully implement the documented fetch-from-remote configuration.
+No frontend, daemon protocol or original copyright branding is altered by these overlays.
+This slug does not prove verified publisher account ownership or Marketplace approval.
+Brand logo source: https://notebooks.amd.com/static/image.png.
+The logo is packaged locally; no runtime remote-image requests are required.
+Trademark ownership remains with AMD; inclusion is not a claim of official publisher approval.
+No production keys, account passwords or signed Marketplace identity are embedded.

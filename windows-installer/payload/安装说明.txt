@@ -1,0 +1,80 @@
+Dify Windows 完整安装器
+版本：Dify 1.17.1 / 安装器 1.0.10 / AMDTokenFactory 动态模型插件 0.0.10
+插件与本地集成作者：Letian Kang
+联系邮箱：Letian.Kang@amd.com
+
+这是真正部署并启动 Dify 平台的 EXE，不是只有一个模型插件。
+准备并构建后的安装器内嵌 Dify 官方 Docker 部署资产、Compose 运行器、许可证和 AMDTokenFactory 标准插件包。
+当前源码的新包SHA-256暂为全零占位，主维护者必须先在所有引用处替换为实际经审阅哈希，才能准备、测试或构建；不得绕过固定哈希校验。
+首次安装需要联网下载 Dify API/Web、PostgreSQL、Redis、Weaviate、Sandbox、Agent 等运行镜像。
+本版为联网安装器，不声称在无 Docker/WSL 的全新 Windows 上完全离线安装。
+
+前提：Windows 10/11 x64、已启用 WSL2、WSL 内可用 Docker Engine 或 Docker Desktop WSL 集成。
+完整本地栈建议至少给 WSL/Docker 4 核、8 GiB 内存和 20 GiB Linux 文件系统自由空间。
+若前置依赖缺失，界面会指出原因并提供官方说明，不静默修改系统、接受 Docker 许可或重启电脑。
+现有 WSL Docker Engine 可直接复用，无须额外安装 Docker Desktop。
+Docker Desktop 在大型企业商业使用时可能需要订阅，请按官方许可核对。
+
+关闭之前的旧安装器窗口（不是卸载旧实例或旧插件），双击 Dify-Setup-1.17.1-Windows-x64-1.0.10.exe：
+1. 选择已有 WSL2 发行版，默认本机端口 18080。
+2. 阅读 Dify 许可证，仅用于自己的单工作区，不移除 Dify 标识或版权。
+3. 点击“安装并启动 Dify”；首次镜像下载需要数分钟，视网络而定。
+4. 就绪后自动打开 http://127.0.0.1:18080/install，自行创建管理员账号。
+5. 桌面与开始菜单会建立启动、停止和打开网页入口。
+若公司浏览器代理影响localhost访问，将localhost/127.0.0.1加入代理例外；安装器自检不走代理。
+
+本版保留 Windows .NET → WSL2 发行版参数与路径转换修复，网页检测统一使用 IPv4 127.0.0.1。
+WSL检查失败会显示步骤、退出码和非敏感诊断，不要求因此重装WSL或Docker。
+如果已显示“Dify application and setup API are ready”并建立快捷方式，服务已经启动；
+不要因旧版最后“操作超时”重复安装，直接打开 http://127.0.0.1:18080/install。
+新版在服务已启动后把最后网页检测问题显示为警告，不冒充整个安装失败。
+
+通用“插件管理”按钮只打开Dify原生集成页面。
+该按钮不解包、不安装插件、不修改签名策略；所有插件共用Dify的安装、配置和卸载机制。
+1.0.10为AMDTokenFactory动态目录兼容版，不打包固定模型清单；从公网/v1/models读取当前聊天目录。
+因为Dify1.17.1／SDK0.10.2没有完整接通文档中的远端发现接口，本版附带最小API兼容覆盖层。
+首次安装仅对API／Worker绑定四个只读源码文件，不改Dify前端、守护进程协议或数据库。
+新身份amdtokenfactory/amdtokenfactory不是旧namespace的同ID升级，不迁移旧凭据、默认模型或应用引用。
+目录按凭据摘要缓存最多30秒，API层同时按租户／供应商隔离；打开或刷新列表时更新，不启动后台轮询。
+获取目录失败会报错，不拿静态旧清单冒充当前状态。未知输出上限不虚构产品承诺。
+
+运行数据保存在该 WSL 用户的 ~/.local/share/dify-windows，而不是 Windows NTFS 挂载目录。
+安装器界面和部署载荷保存在当前用户 LocalAppData/Programs/DifyLocal。
+停止不会删除数据库、上传文件、插件或 Docker volumes；不会操作其他 Compose 项目。
+本版本只做全新隔离安装，不接管已有 Dify，也不自动迁移旧 Weaviate 数据。
+仅发布宿主 loopback 的网页端口18080与调试端口15003，不开放局域网。
+
+AMDTokenFactory 原生模型提供方：
+1. 打开Dify的“集成”，或点击安装器通用“插件管理”（http://127.0.0.1:所选端口/integrations）。
+2. 使用Dify“安装→从本地文件”导入payload/plugins/AMDTokenFactory-0.0.10.difypkg或经校验的同版插件包。
+3. 首次使用时，由用户在独立实例中单独授权，在“集成→模型提供方→AMDTokenFactory”中配置新身份所用凭据。
+新插件身份amdtokenfactory/amdtokenfactory；完整供应商名amdtokenfactory/amdtokenfactory/amdtokenfactory。
+旧amdgpucloud/amdgpucloud/amdgpucloud凭据不会自动迁移到新身份。
+不得为此次改名卸载现有旧Dify实例或旧插件；不得导出、复制或重新粘贴旧实例中已保存的Key。
+保留旧实例、凭据、默认模型与应用引用不变；本安装器不读取或转移旧凭据。
+本地namespace与Marketplace组织归属批准不同，不宣称官方签名或上架。
+获取Key：https://developer.amd.com.cn/radeon/modelapis（由用户手动获取）。
+固定API：https://developer.amd.com.cn/radeon/api/v1；模型请求仍携带X-Source: dify。
+插件尚未 Marketplace 签名；本地 Dify 默认验证插件签名。
+只有你明确勾选“允许未签名开发插件（仅此新建本地实例）”才会在新实例放开该校验。
+该选项是实例级而非单包白名单，不会修改其他 Dify 生产服务。
+真实公网模型和业务路径仍需用户自己的测试 Key 验证，不内置任何 API Key。
+
+动态目录需要本版附带的API兼容层，单独插件不保证未修改的Dify Cloud能自动发现所有模型。
+生成兼容层不启动或重启服务；remote-models部署动作只滚动API／API WebSocket／Worker／Worker Beat。
+这是部署操作而非只读检查；数据库和守护进程不因该动作重启，不能宣传为零重启更新。
+改名不执行插件或凭据迁移；不以卸载旧实例、复制旧Key或改变旧应用引用作为安装步骤。
+
+完整 Dify 的代码/Workflow/RAG/Agent 功能保持官方组件；模型提供方的能力和计费独立。
+AMDTokenFactory 本版不提供 Embedding/OCR/JSON Schema/并行工具，不能用聊天模型代替知识库向量模型。
+
+安全与卸载：
+所有实例服务密钥首次安装随机生成并以0600权限保存，不显示到日志，不写入EXE。
+关闭窗口不等于停止服务；需要在界面点“停止 Dify”。
+恢复从桌面入口启动即可；不默认添加开机计划任务。
+此 EXE 尚未商业代码签名，不能将其宣称为 AMD 或 Dify 官方签名发行包。
+先停止本实例并备份 WSL 数据，再人工决定是否删除；不提供一键删除数据按钮。
+
+官方部署文档：https://docs.dify.ai/en/self-host/quick-start/docker-compose
+固定发布：https://github.com/langgenius/dify/releases/tag/1.17.1
+Dify 使用附加条款的 Apache 2.0 许可；LICENSE 随包保留，禁止移除前端LOGO和版权。
