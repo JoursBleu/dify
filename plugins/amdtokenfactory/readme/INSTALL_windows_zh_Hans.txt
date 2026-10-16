@@ -1,0 +1,76 @@
+AMDTokenFactory — Windows 浏览器插件说明（实验性原生目录集成）
+版本：0.0.12，仅供 Draft 审查，尚未达到 Marketplace 正式发布条件
+作者：AMDTokenFactory
+自然人作者：Letian Kang
+联系邮箱：Letian.Kang@amd.com
+
+一、前提
+本次实现自动聊天模型目录接口；正式发布前须选定已获批准的配套版本并完成验收。
+插件不包含 Dify API、SDK、daemon、Graphon 源码、API overlay 或 Windows 应用安装器。
+这是导入已有 Dify Workspace 的插件说明，不是 EXE/MSI，也不安装 Dify／WSL／Docker。
+Windows 用户通过浏览器操作，无需本机 Python、ROCm 或显卡驱动。
+自动列出模型需要 UNRELEASED（尚未发布）的配套 SDK／plugin-daemon／Dify／Graphon 修改，
+不是原版 Dify 1.17.1 或已发布 SDK 0.10.2 的能力；原版标准模型选择器中没有本供应商可选模型。
+现有 SDK 基类可加载 provider 覆盖方法，但不分派原生目录 RPC，也不识别新声明字段。
+predefined-model 保留统一 Key 表单与空预定义列表；没有手动模型 ID 或逐模型凭据入口。
+minimum_dify_version: 1.17.1 只是安装下限，不保证目录兼容；SDK 0.10.2 仅用于可复现 Draft 审查。
+旧 SDK 下配置凭据会在网络请求前明确报兼容性错误，不再显示绿色 Key 却没有模型；不内置或下载修改版 SDK。
+Windows 完整应用安装器不在本次投稿内，也不是此插件的依赖。
+
+二、仅在配套栈集成并提供已审查构建后，供测试 Workspace 验证
+1. 若提供了已审查的 AMDTokenFactory-0.0.12.difypkg，可登录有安装权限的 Workspace，
+   在“集成 → 安装 → 从本地文件”导入。
+2. 从 https://developer.amd.com.cn/radeon/modelapis 手动取得自己的 rc-* API Key。
+3. 仅在“模型提供方 → AMDTokenFactory”安全凭据框配置或验证 Key；不要使用内部订阅 Key。
+   配套原生目录链路应自动取得全部符合条件的聊天 ID 和元数据，不录入模型 ID，不配置逐模型凭据。
+   Python 宿主／SDK／插件链路已有模拟传输的离线集成测试；真实部署和浏览器验收未完成。
+   凭据验证成功不能代替 Chat／Agent／Workflow 验收。
+   即使验证成功，上述原版环境仍无模型可选，不能视为推理验收通过。
+固定 API：https://developer.amd.com.cn/radeon/api/v1，不接受自定义 URL。
+保存凭据发送 max_tokens=1 的短验证请求，即使选择器为空也可能计费、消耗额度；/models 不能单独验证 Key。
+未签名包或本地安装被拒绝时联系管理员，不擅自关闭生产安全校验。
+
+三、原生 RPC 与上游状态
+provider YAML 声明 remote_model_catalog: true；get_ai_model_list 动作调用
+fetch_models(model_type, credentials)，响应 models 为 AIModelEntity 列表。
+SDK、daemon、Dify、Graphon 四个组件须配套；主集成须更换 SDK 依赖并独立验证原生分派。
+插件不修改宿主 API，不提供 overlay 部署步骤，不指导 API／Compose 修改或服务重启。
+配套固定提交：SDK f9ba731、daemon 2820380、Graphon 9b2ae3b、Dify API 9c39d70；
+完整公开链接见英文 README 的 Native integration status，源码提案不等于上游已合并或发布。
+已创建的远端发现需求：https://github.com/langgenius/dify/issues/44157
+此前 PR 已关闭、未合并：https://github.com/langgenius/dify/pull/44142
+
+四、身份与目录边界
+技术插件 ID 为 amdtokenfactory/amdtokenfactory，完整 Provider 为
+amdtokenfactory/amdtokenfactory/amdtokenfactory；投稿作者名称不修改技术标识，也不证明 publisher 归属。
+原 ID amdgpucloud/amdgpucloud 与此不同，不是原标识下的升级，
+已保存凭据不能自动迁移。不要卸载旧供应商或复制已保存 Key；仅通过安全凭据表单配置 AMDTokenFactory，
+默认模型和应用引用须另行检查。目录刷新不迁移凭据，也不改写应用。
+fetch_models 经共享 fetch_catalog 和既有脱敏错误映射返回全部聊天模型；非 LLM 类型不联网，返回空列表。
+列目录只读取固定 /models，不发送聊天请求；没有模型 YAML、硬编码 ID 或兜底清单。
+模型、能力、上下文、参数和价格来自元数据；支持结构内新增模型无需重打包，自动 UI 列表仍需要配套栈。
+插件缓存复用 TTL 为 30 秒，以凭据 SHA-256 摘要为键，不存原始 Key 或 Prompt。
+缓存与当前写入者元数据分别最多 64 项，查找清理过期项，完成请求后清理写入者；租户隔离由宿主负责。
+刷新失败脱敏报错，不以旧目录兜底；旧请求不能在新刷新、失败、淘汰或清空后覆盖或重新填充缓存。
+畸形 status 类型安全失败；调用检查目录成员资格。输入最多 2 MiB、2,048 条。
+按元数据过滤 OCR／非聊天模型，保留声明图片输入的 vision LLM；单工具和 JSON Object 取决于元数据。
+未知最大输出值不虚构上限，默认预算不是服务最大值；不声明并行工具、JSON Schema、Embedding、OCR 或视频能力。
+
+五、计费、隐私与 Key 安全
+Dify 展示普通输入／输出估算价格，不含缓存折扣；实际扣费、额度及限额以 AMDTokenFactory 账号和账单为准。
+请求固定带 X-Source: dify 汇总渠道用量，不附加用户、工作区、应用、会话或请求标识。
+Prompt、历史、图片和工具数据会发送到 AMD；插件不新增持久化存储，但服务可能保留日志，详见插件根目录 PRIVACY.md。
+Key 只填写到安全凭据框，不发送到聊天、GitHub、截图或日志。
+泄漏或停用的 Key 须在 AMDTokenFactory 撤销；产品更名不自动撤销云端 Key。
+
+六、验收与支持
+离线 provider 覆盖方法测试可在 SDK 0.10.2 上运行，覆盖全量新 ID、元数据、错误、无聊天调用及有界缓存竞态。
+原生 SDK 分派测试由独立集成任务完成；这些离线测试不等同于 UI 验收。
+未来实际构建须重跑包安全及官方 Marketplace 校验，包括新声明字段兼容性。
+原生列表支持、公网 Key 的 Chat／Agent／Workflow、视觉／JSON／工具续轮和 GPU 侧取消仍待验收。
+源码开发脚本仅供开发参考，不是包内工具或安装步骤；此 Draft 不宣称运行就绪。
+非 Draft 发布前须核验当前输出上限、价格、publisher 归属、许可和品牌授权。
+源码：https://github.com/JoursBleu/dify；支持联系见文首，反馈只附版本和脱敏错误。
+Dify 开源许可证：https://github.com/JoursBleu/dify/blob/696759f84024eb01e53dd19f546139b5e4b2cc28/LICENSE
+第三方许可和商标声明继续适用；本地 Logo 不联网加载，来源见插件根目录 _assets/BRAND_ASSET_NOTICE.txt。
+本实验性 Draft 不代表 AMD／Dify 官方签名、法律许可结论、publisher 身份或 Marketplace 批准。
