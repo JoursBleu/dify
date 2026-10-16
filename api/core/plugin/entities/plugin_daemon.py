@@ -83,6 +83,12 @@ class PluginModelSchemaEntity(BaseModel):
     model_config = ConfigDict(protected_namespaces=())
 
 
+class PluginModelListEntity(BaseModel):
+    """One bounded, credential-aware catalog returned by the model/list action."""
+
+    models: list[AIModelEntity] = Field(max_length=2048)
+
+
 class PluginModelProviderDeclaration(ProviderEntity):
     plugin_unique_identifier: str = Field(description="The plugin unique identifier.")
     installation_source: PluginInstallationSource | None = Field(description="The plugin installation source.")

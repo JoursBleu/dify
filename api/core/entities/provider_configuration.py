@@ -5,6 +5,7 @@ import logging
 import re
 from collections import defaultdict
 from collections.abc import Iterator, Sequence
+from copy import deepcopy
 from json import JSONDecodeError
 from typing import Any, override
 
@@ -1702,6 +1703,32 @@ class ProviderConfiguration(BaseModel):
             model_types.append(model_type)
         else:
             model_types = list(provider_schema.supported_model_types)
+
+        if self.using_provider_type == ProviderType.CUSTOM and provider_schema.remote_model_catalog:
+            # Declaration schemas may be shared by multiple requests/tenants.
+            # Replace the catalog only on a deep, local copy, never on either
+            # self.provider or the declaration/cache owned by PluginService.
+            provider_schema = provider_schema.model_copy(deep=True)
+            provider_schema.models = []
+            has_catalog_credentials = False
+            for catalog_model_type in model_types:
+                if catalog_model_type not in provider_schema.supported_model_types:
+                    continue
+                credentials = self.get_current_credentials(catalog_model_type, "")
+                if not credentials or not self.custom_configuration.provider:
+                    continue
+                has_catalog_credentials = True
+                provider_schema.models.extend(
+                    deepcopy(
+                        self._get_model_runtime().fetch_models(
+                            provider=self.provider.provider,
+                            model_type=catalog_model_type,
+                            credentials=deepcopy(credentials),
+                        )
+                    )
+                )
+            if not has_catalog_credentials:
+                return []
 
         # Group model settings by model type and model
         model_setting_map: defaultdict[ModelType, dict[str, ModelSettings]] = defaultdict(dict)

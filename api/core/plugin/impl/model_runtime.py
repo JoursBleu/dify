@@ -210,6 +210,40 @@ class PluginModelRuntime(ModelRuntime):
         )
 
     @override
+    def fetch_models(
+        self, *, provider: str, model_type: ModelType, credentials: dict[str, Any]
+    ) -> Sequence[AIModelEntity]:
+        """Fetch an opted-in provider's catalog for this caller, without caching it."""
+        provider_schema = self._get_provider_schema(provider)
+        if not provider_schema.remote_model_catalog:
+            raise ValueError("Provider does not support remote model catalogs.")
+        if model_type not in provider_schema.supported_model_types:
+            raise ValueError("Unsupported remote catalog model type.")
+        if not credentials:
+            return []
+
+        plugin_id, provider_name = self._split_provider(provider_schema.provider)
+        models = self.client.fetch_models(
+            tenant_id=self.tenant_id,
+            user_id=self.user_id,
+            plugin_id=plugin_id,
+            provider=provider_name,
+            model_type=model_type.value,
+            credentials=credentials,
+        )
+        if len(models) > 2048:
+            raise ValueError("Remote model catalog exceeds 2048 models.")
+        identities: set[tuple[str, ModelType]] = set()
+        for model in models:
+            if not isinstance(model, AIModelEntity) or model.model_type != model_type or not model.model.strip():
+                raise ValueError("Invalid remote model catalog entry.")
+            identity = (model.model, model.model_type)
+            if identity in identities:
+                raise ValueError("Duplicate remote model catalog identity.")
+            identities.add(identity)
+        return models
+
+    @override
     def get_model_schema(
         self,
         *,
@@ -218,6 +252,24 @@ class PluginModelRuntime(ModelRuntime):
         model: str,
         credentials: dict[str, Any],
     ) -> AIModelEntity | None:
+        provider_schema = self._get_provider_schema(provider)
+        if provider_schema.remote_model_catalog:
+            if not credentials:
+                return None
+            # Keep credential-aware metadata fresh using the existing schema
+            # RPC; neither read nor write the generic static schema cache.
+            plugin_id, provider_name = self._split_provider(provider_schema.provider)
+            return self.client.get_model_schema(
+                tenant_id=self.tenant_id,
+                user_id=self.user_id,
+                plugin_id=plugin_id,
+                provider=provider_name,
+                model_type=model_type.value,
+                model=model,
+                credentials=credentials,
+                remote_model_catalog=True,
+            )
+
         cache_key = self._get_schema_cache_key(
             provider=provider,
             model_type=model_type,

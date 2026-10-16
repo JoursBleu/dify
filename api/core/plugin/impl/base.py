@@ -227,9 +227,14 @@ class BasePluginClient:
         headers: dict[str, str] | None = None,
         data: bytes | dict[str, Any] | None = None,
         files: dict[str, Any] | None = None,
+        *,
+        log_errors: bool = True,
     ) -> Generator[str]:
         """
-        Make a stream request to the plugin daemon inner API
+        Make a stream request to the plugin daemon inner API.
+
+        Credential-aware metadata callers disable exception logging because
+        transport exceptions can contain untrusted response contents.
         """
         url, headers, prepared_data, params, files = self._prepare_request(path, headers, data, params, files)
 
@@ -258,7 +263,8 @@ class BasePluginClient:
                     if line:
                         yield line
         except httpx.RequestError:
-            logger.exception("Stream request to Plugin Daemon Service failed")
+            if log_errors:
+                logger.exception("Stream request to Plugin Daemon Service failed")
             raise PluginDaemonInnerError(code=-500, message="Request to Plugin Daemon Service failed")
 
     def _stream_request_with_model[T: BaseModel | dict[str, Any] | list[Any] | bool | str](

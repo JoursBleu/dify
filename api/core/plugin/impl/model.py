@@ -2,10 +2,14 @@ import binascii
 from collections.abc import Generator, Sequence
 from typing import IO, Any
 
+from pydantic import BaseModel
+
 from core.plugin.entities.plugin_daemon import (
     PluginBasicBooleanResponse,
+    PluginDaemonBasicResponse,
     PluginDaemonInnerError,
     PluginLLMNumTokensResponse,
+    PluginModelListEntity,
     PluginModelProviderBinding,
     PluginModelProviderEntity,
     PluginModelSchemaEntity,
@@ -27,6 +31,7 @@ from graphon.model_runtime.utils.encoders import jsonable_encoder
 
 _POLLING_UNSUPPORTED_INVOKE_ERROR_TYPES = frozenset((NotImplementedError.__name__,))
 _POLLING_UNSUPPORTED_ERROR_MESSAGE = "does not support polling"
+_REMOTE_MODEL_RESPONSE_MAX_BYTES = 8 * 1024 * 1024
 
 
 class PluginModelClient(BasePluginClient):
@@ -59,6 +64,62 @@ class PluginModelClient(BasePluginClient):
             list[PluginModelProviderBinding],
         )
 
+    @staticmethod
+    def _read_remote_model_response[T: BaseModel | dict[str, Any]](response: Generator[str], type_: type[T]) -> T:
+        """Accept one bounded success frame only after EOF, closing on every exit.
+
+        Credential-aware payloads must not use the generic daemon parser: its
+        error handling can log or expose untrusted response contents.
+        """
+        try:
+            data: T | None = None
+            for line in response:
+                # Check characters first to avoid encoding an already oversized
+                # string, then enforce the actual UTF-8 byte bound before JSON.
+                if (
+                    len(line) > _REMOTE_MODEL_RESPONSE_MAX_BYTES
+                    or len(line.encode("utf-8")) > _REMOTE_MODEL_RESPONSE_MAX_BYTES
+                ):
+                    raise ValueError("Remote model response exceeds its byte limit.")
+                result = PluginDaemonBasicResponse[type_].model_validate_json(line)
+                if result.code != 0 or result.data is None or data is not None:
+                    raise ValueError("Invalid unary remote model response.")
+                data = result.data
+            if data is None:
+                raise ValueError("Empty unary remote model response.")
+            return data
+        finally:
+            # The transport returns a generator; tolerate plain iterators used
+            # by callers' existing test doubles as well.
+            close = getattr(response, "close", None)
+            if close is not None:
+                close()
+
+    def fetch_models(
+        self,
+        tenant_id: str,
+        user_id: str | None,
+        plugin_id: str,
+        provider: str,
+        model_type: str,
+        credentials: dict[str, Any],
+    ) -> list[AIModelEntity]:
+        """Dispatch get_ai_model_list without logging untrusted catalog/error payloads."""
+        try:
+            response = self._stream_request(
+                "POST",
+                f"plugin/{tenant_id}/dispatch/model/list",
+                data=self._dispatch_payload(
+                    user_id=user_id,
+                    data={"provider": provider, "model_type": model_type, "credentials": credentials},
+                ),
+                headers={"X-Plugin-ID": plugin_id, "Content-Type": "application/json"},
+                log_errors=False,
+            )
+            return self._read_remote_model_response(response, PluginModelListEntity).models
+        except Exception:
+            raise ValueError("Unable to fetch remote model catalog.") from None
+
     def get_model_schema(
         self,
         tenant_id: str,
@@ -68,10 +129,16 @@ class PluginModelClient(BasePluginClient):
         model_type: str,
         model: str,
         credentials: dict[str, Any],
+        remote_model_catalog: bool = False,
     ) -> AIModelEntity | None:
         """
-        Get model schema
+        Get model schema, using a safe fresh unary RPC for opted-in catalogs.
         """
+        if remote_model_catalog:
+            return self._get_remote_model_schema(
+                tenant_id, user_id, plugin_id, provider, model_type, model, credentials
+            )
+
         response = self._request_with_plugin_daemon_response_stream(
             "POST",
             f"plugin/{tenant_id}/dispatch/model/schema",
@@ -95,6 +162,41 @@ class PluginModelClient(BasePluginClient):
             return resp.model_schema
 
         return None
+
+    def _get_remote_model_schema(
+        self,
+        tenant_id: str,
+        user_id: str | None,
+        plugin_id: str,
+        provider: str,
+        model_type: str,
+        model: str,
+        credentials: dict[str, Any],
+    ) -> AIModelEntity | None:
+        """Parse nullable remote metadata without widening the static entity contract."""
+        try:
+            response = self._stream_request(
+                "POST",
+                f"plugin/{tenant_id}/dispatch/model/schema",
+                data=self._dispatch_payload(
+                    user_id=user_id,
+                    data={"provider": provider, "model_type": model_type, "model": model, "credentials": credentials},
+                ),
+                headers={"X-Plugin-ID": plugin_id, "Content-Type": "application/json"},
+                log_errors=False,
+            )
+            data = self._read_remote_model_response(response, dict[str, Any])
+            # Missing metadata is a protocol error; an explicit null means this
+            # credential-aware catalog no longer contains the requested model.
+            raw_schema = data["model_schema"]
+            if raw_schema is None:
+                return None
+            schema = AIModelEntity.model_validate(raw_schema)
+            if schema.model != model or schema.model_type.value != model_type:
+                raise ValueError("Remote model schema does not match the request.")
+            return schema
+        except Exception:
+            raise ValueError("Unable to fetch remote model schema.") from None
 
     def validate_provider_credentials(
         self, tenant_id: str, user_id: str | None, plugin_id: str, provider: str, credentials: dict[str, Any]
