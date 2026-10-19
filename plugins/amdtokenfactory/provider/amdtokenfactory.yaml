@@ -1,0 +1,48 @@
+provider: amdtokenfactory
+label:
+  en_US: AMD Token Factory
+  zh_Hans: AMD Token Factory
+description:
+  en_US: Open models on AMD GPUs for Dify, with a daily free quota, reasoning, tool calling, and vision.
+  zh_Hans: 面向 Dify 的 AMD GPU 开源模型，提供每日免费额度，支持推理、工具调用和图片输入。
+icon_small:
+  en_US: icon.png
+  zh_Hans: icon.png
+icon_large:
+  en_US: icon.png
+  zh_Hans: icon.png
+background: "#F5F5F5"
+help:
+  title:
+    en_US: Get your AMD Token Factory API key
+    zh_Hans: 获取 AMD Token Factory API Key
+  url:
+    en_US: https://developer.amd.com.cn/login?source=sta8ZpC3e
+    zh_Hans: https://developer.amd.com.cn/login?source=sta8ZpC3e
+supported_model_types:
+  - llm
+configurate_methods:
+  - predefined-model
+provider_credential_schema:
+  credential_form_schemas:
+    - variable: api_key
+      label:
+        en_US: API Key
+        zh_Hans: API Key
+      type: secret-input
+      help:
+        en_US: Your AMD Token Factory API key (starts with rc-), used for model calls and key validation.
+        zh_Hans: AMD Token Factory API Key（以 rc- 开头），用于调用模型和校验 Key。
+      required: true
+      placeholder:
+        en_US: Enter your rc-* API key
+        zh_Hans: 输入 rc-* API Key
+models:
+  llm:
+    predefined:
+      - models/llm/*.yaml
+extra:
+  python:
+    provider_source: provider/amdtokenfactory.py
+    model_sources:
+      - models/llm/llm.py
