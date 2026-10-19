@@ -1,0 +1,58 @@
+# Generated from the public AMD Token Factory catalog; do not edit by hand.
+model: DeepSeek-V4-Flash
+label:
+  en_US: DeepSeek-V4-Flash-0731
+  zh_Hans: DeepSeek-V4-Flash-0731
+model_type: llm
+features:
+- agent-thought
+- tool-call
+- stream-tool-call
+fetch_from: predefined-model
+model_properties:
+  mode: chat
+  context_size: 1048576
+parameter_rules:
+- name: max_tokens
+  type: int
+  required: false
+  label:
+    en_US: Max Tokens
+    zh_Hans: 最大输出Token
+  default: 4096
+  min: 1
+  help:
+    en_US: Service output limit is not published; the API enforces its limit.
+    zh_Hans: 服务未公开最大输出值；由API执行限制。
+- name: temperature
+  type: float
+  required: false
+  label:
+    en_US: Temperature
+    zh_Hans: Temperature
+  default: 0.7
+- name: top_p
+  type: float
+  required: false
+  label:
+    en_US: Top P
+    zh_Hans: Top P
+  default: 1.0
+- name: response_format
+  type: string
+  required: false
+  label:
+    en_US: Response Format
+    zh_Hans: 回复格式
+  options:
+  - text
+  - json_object
+  - json_schema
+- name: json_schema
+  use_template: json_schema
+deprecated: false
+pricing:
+  input: '0'
+  output: '0'
+  unit: '0.000001'
+  currency: USD

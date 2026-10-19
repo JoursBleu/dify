@@ -1,0 +1,4 @@
+# Markdown hard line breaks intentionally use two trailing spaces.
+# Keep this outside the plugin package so it does not change the reviewed archive.
+amdtokenfactory/*.md whitespace=-blank-at-eol
+amdtokenfactory/readme/*.md whitespace=-blank-at-eol
