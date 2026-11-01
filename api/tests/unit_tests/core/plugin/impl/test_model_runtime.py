@@ -65,6 +65,7 @@ def _recording_model_client(
         client.check_llm_polling,
         client.invoke_tts,
         client.get_model_schema,
+        client.get_model_list,
         client.get_llm_num_tokens,
     ):
         monkeypatch.setattr(client, method.__name__, recorder(method))
@@ -1108,3 +1109,30 @@ def test_get_provider_schema_supports_short_alias_and_rejects_invalid_provider(m
 
     with pytest.raises(ValueError, match="Invalid provider"):
         runtime._get_provider_schema("missing")
+
+
+def test_get_model_list_forwards_credentials_to_plugin(monkeypatch: pytest.MonkeyPatch) -> None:
+    client, client_results, client_calls = _recording_model_client(monkeypatch)
+    models = [_build_model_schema()]
+    client_results["get_model_list"] = models
+    runtime = PluginModelRuntime(tenant_id="tenant", user_id="user", client=client, plugin_service=PluginService)
+    runtime.fetch_model_providers()
+
+    result = runtime.get_model_list(
+        provider="langgenius/openai/openai",
+        model_type=ModelType.LLM,
+        credentials={"api_key": "secret"},
+    )
+
+    assert result is models
+    assert client_calls["get_model_list"] == [
+        call(
+            tenant_id="tenant",
+            user_id="user",
+            plugin_id="langgenius/openai",
+            provider="openai",
+            model_type=ModelType.LLM.value,
+            credentials={"api_key": "secret"},
+            plugin_unique_identifier="langgenius/openai:1.0.0@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        )
+    ]

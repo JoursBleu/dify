@@ -294,6 +294,24 @@ class PluginModelRuntime(ModelRuntime):
 
         return schema
 
+    def get_model_list(
+        self,
+        *,
+        provider: str,
+        model_type: ModelType,
+        credentials: dict[str, Any],
+    ) -> list[AIModelEntity]:
+        plugin_id, provider_name = self._split_provider(provider)
+        return self.client.get_model_list(
+            tenant_id=self.tenant_id,
+            user_id=self.user_id,
+            plugin_id=plugin_id,
+            **self._dispatch_identity(provider),
+            provider=provider_name,
+            model_type=model_type.value,
+            credentials=credentials,
+        )
+
     @overload
     def invoke_llm(
         self,

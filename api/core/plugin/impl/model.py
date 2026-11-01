@@ -6,6 +6,7 @@ from core.plugin.entities.plugin_daemon import (
     PluginBasicBooleanResponse,
     PluginDaemonInnerError,
     PluginLLMNumTokensResponse,
+    PluginModelListEntity,
     PluginModelProviderBinding,
     PluginModelProviderEntity,
     PluginModelSchemaEntity,
@@ -95,6 +96,40 @@ class PluginModelClient(BasePluginClient):
             return resp.model_schema
 
         return None
+
+    def get_model_list(
+        self,
+        tenant_id: str,
+        user_id: str | None,
+        plugin_id: str,
+        provider: str,
+        model_type: str,
+        credentials: dict[str, Any],
+        *,
+        plugin_unique_identifier: str | None = None,
+    ) -> list[AIModelEntity]:
+        """
+        Get model list
+        """
+        response = self._request_with_plugin_daemon_response_stream(
+            "POST",
+            f"plugin/{tenant_id}/dispatch/model/list",
+            PluginModelListEntity,
+            data=self._dispatch_payload(
+                user_id=user_id,
+                data={
+                    "provider": provider,
+                    "model_type": model_type,
+                    "credentials": credentials,
+                },
+            ),
+            headers=plugin_dispatch_headers(plugin_id, plugin_unique_identifier),
+        )
+
+        for resp in response:
+            return resp.models
+
+        return []
 
     def validate_provider_credentials(
         self,

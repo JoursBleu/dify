@@ -11,6 +11,7 @@ from pytest_mock import MockerFixture
 from core.plugin.entities.plugin import PluginInstallationSource
 from core.plugin.entities.plugin_daemon import (
     PluginDaemonInnerError,
+    PluginModelListEntity,
     PluginModelProviderDeclaration,
     PluginStringResultResponse,
 )
@@ -29,7 +30,7 @@ from graphon.model_runtime.entities.llm_entities import (
     LLMUsage,
 )
 from graphon.model_runtime.entities.message_entities import AssistantPromptMessage
-from graphon.model_runtime.entities.model_entities import ModelType
+from graphon.model_runtime.entities.model_entities import AIModelEntity, FetchFrom, ModelType
 from graphon.model_runtime.entities.provider_entities import ConfigurateMethod, ProviderEntity
 
 PLUGIN_IDENTIFIER = "org/plugin:1.0.0@aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
@@ -106,6 +107,41 @@ class TestModelClientCases:
             )
 
             assert result is None
+
+        def test_get_model_list(self, mocker: MockerFixture):
+            client = PluginModelClient()
+            models = [
+                AIModelEntity(
+                    model="model",
+                    label=I18nObject(en_US="model"),
+                    model_type=ModelType.LLM,
+                    fetch_from=FetchFrom.PREDEFINED_MODEL,
+                    model_properties={},
+                )
+            ]
+            stream_mock = mocker.patch.object(
+                client,
+                "_request_with_plugin_daemon_response_stream",
+                return_value=iter([PluginModelListEntity(models=models)]),
+            )
+
+            result = client.get_model_list(
+                tenant_id="tenant-1",
+                user_id="user-1",
+                plugin_id="org/plugin",
+                provider="provider-a",
+                model_type="llm",
+                credentials={"api_key": "key"},
+                plugin_unique_identifier=PLUGIN_IDENTIFIER,
+            )
+
+            assert result == models
+            assert stream_mock.call_args.args[:2] == ("POST", "plugin/tenant-1/dispatch/model/list")
+            assert stream_mock.call_args.kwargs["data"]["data"] == {
+                "provider": "provider-a",
+                "model_type": "llm",
+                "credentials": {"api_key": "key"},
+            }
 
         def test_validate_provider_credentials(self, mocker: MockerFixture):
             client = PluginModelClient()

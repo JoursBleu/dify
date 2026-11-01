@@ -83,6 +83,10 @@ class PluginModelSchemaEntity(BaseModel):
     model_config = ConfigDict(protected_namespaces=())
 
 
+class PluginModelListEntity(BaseModel):
+    models: list[AIModelEntity] = Field(description="The model list.")
+
+
 class PluginModelProviderDeclaration(ProviderEntity):
     plugin_unique_identifier: str = Field(description="The plugin unique identifier.")
     installation_source: PluginInstallationSource | None = Field(description="The plugin installation source.")
